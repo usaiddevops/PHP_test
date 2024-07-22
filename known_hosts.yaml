@@ -1,0 +1,4 @@
+- name: Add EC2 host to known_hosts
+  run: |
+    mkdir -p ~/.ssh
+    ssh-keyscan -H ec2-54-166-29-223.compute-1.amazonaws.com >> ~/.ssh/known_hosts
