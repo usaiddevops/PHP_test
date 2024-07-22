@@ -46,12 +46,12 @@ jobs:
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.4
       with:
-        ssh-private-key: ${{ec2-54-166-29-223.compute-1.amazonaws.com}}
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
     - name: Deploy to EC2
       run: |
-        rsync -avz --exclude='.git*' --exclude='node_modules' --exclude='.github' ./ ec2-user@your-ec2-public-dns:/var/www/html/your-app-directory
-        ssh ec2-user@your-ec2-public-dns << 'EOF'
+        rsync -avz --exclude='.git*' --exclude='node_modules' --exclude='.github' ./ ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com:/var/www/html/your-app-directory
+        ssh -o StrictHostKeyChecking=no ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com << 'EOF'
           cd /var/www/html/your-app-directory
           composer install --prefer-dist --no-progress --no-suggest
           php artisan migrate --force
