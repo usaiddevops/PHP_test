@@ -48,15 +48,13 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    - name: Add EC2 host to known_hosts
+    - name: Sync files with EC2
       run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H ec2-54-166-29-223.compute-1.amazonaws.com >> ~/.ssh/known_hosts
-
+        rsync -avz --exclude='.git*' --exclude='node_modules' --exclude='.github' ./ ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com:/var/www/html/your-app-directory/
+      
     - name: Deploy to EC2
       run: |
-        rsync -avz --exclude='.git*' --exclude='node_modules' --exclude='.github' ./ ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com:/var/www/html/your-app-directory
-        ssh -o StrictHostKeyChecking=no ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com << 'EOF'
           cd /var/www/html/your-app-directory
           composer install --prefer-dist --no-progress --no-suggest
           php artisan migrate --force
