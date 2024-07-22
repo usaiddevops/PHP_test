@@ -24,12 +24,12 @@ jobs:
     - name: Validate PHP version
       run: php -v
 
-    - name: Install Composer dependencies
-      if: fileExists('composer.json')
-      run: composer install --prefer-dist --no-progress --no-suggest
+    - name: Install Composer (if needed)
+      run: |
+        if [ -f "composer.json" ]; then
+          composer install --prefer-dist --no-progress --no-suggest
+        fi
 
     - name: Validate PHP syntax
       run: |
-        for file in $(find . -name "*.php"); do
-          php -l $file;
-        done
+        find . -name "*.php" -print0 | xargs -0 -n 1 php -l
