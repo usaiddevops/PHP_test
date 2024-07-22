@@ -46,7 +46,7 @@ jobs:
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.4
       with:
-        ssh-private-key: ${{ ssh -i "php.pem" ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com }}
+        ssh-private-key: ${{ec2-54-166-29-223.compute-1.amazonaws.com}}
 
     - name: Deploy to EC2
       run: |
