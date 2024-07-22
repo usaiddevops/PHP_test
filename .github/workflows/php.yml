@@ -24,7 +24,7 @@ jobs:
     - name: Validate PHP version
       run: php -v
 
-    - name: Install Composer (if needed)
+    - name: Install Composer
       run: |
         if [ -f "composer.json" ]; then
           composer install --prefer-dist --no-progress --no-suggest
@@ -48,13 +48,15 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    - name: Sync files with EC2
+    - name: Add EC2 host to known_hosts
       run: |
-        rsync -avz --exclude='.git*' --exclude='node_modules' --exclude='.github' ./ ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com:/var/www/html/your-app-directory/
-      
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ec2-54-166-29-223.compute-1.amazonaws.com >> ~/.ssh/known_hosts
+
     - name: Deploy to EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com << 'EOF'
+        rsync -avz --exclude='.git*' --exclude='node_modules' --exclude='.github' ./ ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com:/var/www/html/your-app-directory
+        ssh -o StrictHostKeyChecking=no ubuntu@ec2-54-166-29-223.compute-1.amazonaws.com << 'EOF'
           cd /var/www/html/your-app-directory
           composer install --prefer-dist --no-progress --no-suggest
           php artisan migrate --force
